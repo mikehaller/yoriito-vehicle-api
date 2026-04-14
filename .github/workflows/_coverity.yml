@@ -1,0 +1,72 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# Copyright 2026 JASPAR
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Run coverity to make reports
+
+on:
+  workflow_call:
+
+# required secrets
+# COV_URL: URL of the Coverity server.
+# COV_STREAM: Name of the Coverity stream.
+# COV_USER: Username for Coverity.
+# COVERITY_UPLOADER_TOKEN: Token for uploading defects to Coverity.
+
+jobs:
+  coverity:
+    runs-on: [self-hosted, Linux, X64, source-code-check]
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Run coverity for CWE checks
+        run: |
+          cd ${{github.workspace}}
+          mkdir -p build/idir
+          cd build
+          cmake ..
+          $COV_ANA_HOME/bin/cov-build --dir idir --emit-complementary-info make -j 12
+          $COV_ANA_HOME/bin/cov-analyze --dir idir --all
+          $COV_ANA_HOME/bin/cov-format-errors --dir idir --html-output coverity-report-cwe
+          $COV_ANA_HOME/bin/cov-commit-defects --dir idir --url ${{ secrets.COV_URL }} --stream ${{ secrets.COV_STREAM }}-CWE --user ${{ secrets.COV_USER }} --password ${{secrets.COVERITY_UPLOADER_TOKEN}}
+
+      - name: Run coverity for C++ MISRA checks
+        run: |
+          cd ${{github.workspace}}/build
+          $COV_ANA_HOME/bin/cov-analyze --dir idir --disable-default --coding-standard-config $COV_ANA_HOME/config/coding-standards/misracpp2023/misracpp2023-all.config
+          $COV_ANA_HOME/bin/cov-format-errors --dir idir --html-output coverity-report-misra
+          $COV_ANA_HOME/bin/cov-commit-defects --dir idir --url ${{ secrets.COV_URL }} --stream ${{ secrets.COV_STREAM }}-MISRA --user ${{ secrets.COV_USER }} --password ${{secrets.COVERITY_UPLOADER_TOKEN}}
+          
+      - name: Run coverity for C++ CERT checks
+        run: |
+          cd ${{github.workspace}}/build
+          $COV_ANA_HOME/bin/cov-analyze --dir idir --disable-default --coding-standard-config $COV_ANA_HOME/config/coding-standards/cert-cpp/cert-cpp-all.config
+          $COV_ANA_HOME/bin/cov-format-errors --dir idir --html-output coverity-report-cert
+          $COV_ANA_HOME/bin/cov-commit-defects --dir idir --url ${{ secrets.COV_URL }} --stream ${{ secrets.COV_STREAM }}-CERT --user ${{ secrets.COV_USER }} --password ${{secrets.COVERITY_UPLOADER_TOKEN}}
+
+      # Upload the coverity result files as artifacts. These files are only available for 5 days.
+      # If you want to check detail, please check it on the web application that is running on the local machine.
+      - name: Upload coverity result files to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverity-result
+          path: |
+            ${{github.workspace}}/build/coverity-report-cwe/summary.html
+            ${{github.workspace}}/build/coverity-report-cwe/index*.html
+            ${{github.workspace}}/build/coverity-report-misra/summary.html
+            ${{github.workspace}}/build/coverity-report-misra/index*.html
+            ${{github.workspace}}/build/coverity-report-cert/summary.html
+            ${{github.workspace}}/build/coverity-report-cert/index*.html
+          retention-days: 5

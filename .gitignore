@@ -1,0 +1,9 @@
+build/*
+*.bk
+docs/CMakeFiles/
+docs/Doxyfile.docs_common
+docs/Doxyfile.docs_signal
+docs/Makefile
+docs/cmake_install.cmake
+
+.vscode/

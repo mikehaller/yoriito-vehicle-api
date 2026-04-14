@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+DLT_RUNTIME_CONFIG="/tmp/dlt-runtime.cfg"
+DLT_OFFLINETRACE_CONFIG="/etc/dlt.conf"
+if ! [ -f "$DLT_RUNTIME_CONFIG" ]; then
+    # Set LoggingMode = 3 (both) to enable file output
+    echo "LoggingMode = 3" > "$DLT_RUNTIME_CONFIG"
+fi
+if ! [ -f "$DLT_OFFLINETRACE_CONFIG" ]; then
+    echo "dlt.conf not found" >&2
+fi
+# If the specified config file does not exist, start with default behavior (not treated as an error)
+dlt-daemon -c "$DLT_OFFLINETRACE_CONFIG" -d 
