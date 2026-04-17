@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# Copyright 2026 JASPAR
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Run lizard
+
+on:
+  workflow_call:
+
+jobs:
+  lizard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Prepare lizard
+        run: |
+          cd ${{github.workspace}}
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install lizard
+          pip install jinja2
+
+      - name: Run lizard
+        run: |
+          cd ${{github.workspace}}
+          source .venv/bin/activate
+          lizard -l cpp -C 25 -L 100 -a 10 -w -x "./test/*" -x "./test_integration/*" -x "./access/*" -x "./common/databroker/base_inspect_data.h"
+          lizard -l cpp -C 25 -L 100 -a 10 -x "./test/*" -x "./test_integration/*" -x "./access/*" -x "./common/databroker/base_inspect_data.h" --html > lizard_result.html
+          deactivate
+
+      - name: Upload result
+        uses: actions/upload-artifact@v4
+        with:
+          name: lizard-result
+          path: ${{github.workspace}}/lizard_result.html

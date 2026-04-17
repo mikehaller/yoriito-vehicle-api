@@ -1,0 +1,32 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Copyright 2026 JASPAR
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef VEHICLE_POWERTRAIN_TRACTIONBATTERY_CHARGING_CHARGINGPORT_FRONTMIDDLE_H
+#define VEHICLE_POWERTRAIN_TRACTIONBATTERY_CHARGING_CHARGINGPORT_FRONTMIDDLE_H
+
+#include "Signal_IsChargingCableConnected.h"
+#include "Signal_IsChargingCableConnected_Availability_Sensor.h"
+#include "Signal_IsChargingCableLocked.h"
+#include "Signal_IsChargingCableLocked_Availability_Actuator.h"
+#include "Signal_IsChargingCableLocked_Availability_Sensor.h"
+#include "Signal_IsFlapOpen.h"
+#include "Signal_IsFlapOpen_Availability_Actuator.h"
+#include "Signal_IsFlapOpen_Availability_Sensor.h"
+#include "Signal_SupportedInletTypes.h"
+
+#endif  // VEHICLE_POWERTRAIN_TRACTIONBATTERY_CHARGING_CHARGINGPORT_FRONTMIDDLE_H
