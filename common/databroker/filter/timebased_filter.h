@@ -19,6 +19,8 @@
 #ifndef YORIITO_VEHICLE_API_UTILITY_INC_DATABROKER_FILTER_TIMEBASED_FILTER_H_
 #define YORIITO_VEHICLE_API_UTILITY_INC_DATABROKER_FILTER_TIMEBASED_FILTER_H_
 
+#include <cstdint>
+
 /**
  * @ingroup common
  * @namespace yoriito::databroker::filter
